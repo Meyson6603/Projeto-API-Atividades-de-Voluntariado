@@ -10,7 +10,7 @@ export default function userLogin() {
         <h2>Sign In</h2>
         <form id="form-login">
             <div id="boxUsername"><label for="inputUsename" id="username"><i class="material-icons"
-                        id="person">person</i><input type="text" placeholder="Username" name="inputUsename"
+                        id="person">person</i><input type="email" placeholder="Email" name="inputUsename"
                         id="inputUsename"></label></div>
             <div id="boxUsername"><label for="inputUsename" id="username"><i class="material-icons"
                         id="person">lock</i><input type="password" placeholder="Password" name="inputUsename"
