@@ -1,8 +1,10 @@
 const express = require('express')
 const routerUser = require('./router/users')
+const cookieParser = require('cookie-parser')
 const app = express()
-app.use(routerUser)
+app.use(cookieParser())
 app.use(express.json())
+app.use(routerUser)
 app.use(express.static('./public'))
 require('dotenv').config({ path: './config/.env' })
 
