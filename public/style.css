@@ -142,3 +142,119 @@ h2 {
 #show {
     display: flex;
 }
+
+/* --------------------- */
+
+/* Estilos básicos da barra de navegação */
+
+#navbar {
+    height: 100px;
+    width: 100%;
+    background: linear-gradient(to bottom, #14B8A6, #e9e4f0);
+    box-shadow: 0 0 5px black;
+    position: fixed;
+    top: 0px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    /* border: 2px solid black; */
+    gap: 30px;
+}
+
+
+
+.navbar a {
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    display: block;
+}
+
+/* Estilos da caixa dropdown */
+.navbar .dropdown {
+    position: absolute;
+    margin: auto;
+    background-color: #14B8A6;
+    display: none;
+    padding: 0px 0;
+    min-width: 150px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Animação de empurrar para baixo */
+.navbar .nav-item:hover .dropdown {
+    display: block;
+    animation: slideDown 0.5s ease forwards;
+}
+
+/* Keyframes para a animação de empurrar */
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar .dropdown li:last-child {
+    border-bottom: none;
+}
+
+.navbar .dropdown a {
+    color: black;
+}
+
+.navbar .dropdown a:hover {
+    background-color: #0D9488;
+}
+
+#iconUser {
+    position: relative;
+    right: 50px;
+    display: flex;
+}
+
+#entrance {
+    position: absolute;
+    /* width: 100%; */
+    display: flex;
+    justify-content: end;
+    /* margin-right: 20px; */
+    right: 30px;
+    gap: 20px;
+}
+
+#entrance button {
+    width: 5vw;
+    height: 5vh;
+    /* background: none; */
+    border: none;
+}
+
+#signIn {
+    background: #4bc9f7;
+    cursor: pointer;
+}
+
+#signUp {
+    background: #14B8A6;
+    cursor: pointer;
+}

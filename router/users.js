@@ -9,10 +9,6 @@ router.get('/me', getUsers)
 //     // const us
 // })
 router.get('/users', getUsers)
-router.post('/login', (req, res) => {
-    const filePath = path.join(__dirname, '..', 'public', 'index.html');
-    res.sendFile(filePath);
-})
 router.get('/login', (req, res) => {
     const filePath = path.join(__dirname, '..', 'public', 'index.html');
     res.sendFile(filePath);
