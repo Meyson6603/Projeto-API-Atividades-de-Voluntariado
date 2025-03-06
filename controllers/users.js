@@ -4,26 +4,36 @@ const dbUsers = new Database('users')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
+require('dotenv').config({ path: './config/.env' })
 // const { use } = require('../router/users');
 
-const keySecrect = 'kdjkfljsadklfjsdalkjaslkdjsalkdjs'
+const keySecrect = process.env.KEYSECRET
 // const users = [{ id: 1, username: 'Meyson', email: 'meyson6603@gmail.com', password: '123456', role: 'admin' }, { id: 2, username: 'Vitor', email: 'vitor@gmail.com', password: '123456', role: 'admin' }]
-
 function getUsers(req, res) {
-    // res.json(null)
-    // res.send(`<h1>Apenas um Teste</h1>`)
-    // console.log('teste')
-
-    console.log()
+    // dbUsers.open()
     dbUsers.readAllData((err, data) => {
         if (err) {
             console.log(err)
             res.status(500).json({ error: 'Erro ao buscar usuários' });
             return;
         }
+        let dataUser = []
+        data.forEach(element => {
+            dataUser.push(JSON.parse(element.value))
+            // console.log(dataUser.username)
+        });
         console.log(data)
-        // res.json(data);
+        console.log(dataUser)
+        res.json(dataUser);
     });
+}
+function getUser(req, res) {
+    // res.json(null)
+    // res.send(`<h1>Apenas um Teste</h1>`)
+    // console.log('teste')
+
+    console.log()
+
     const cookieJWT = req.cookies["session"]
     try {
         const loginUser = jwt.verify(cookieJWT, keySecrect)
@@ -118,7 +128,8 @@ async function loginUsers(req, res) {
 
         // Encontrar o usuário com o email fornecido
         const userFound = data.find(user => {
-            const userData = JSON.parse(user.value); // Assumindo que os dados são armazenados como JSON
+            const userData = JSON.parse(user.value);
+            // console.log(userData + '/' + user.value) // Assumindo que os dados são armazenados como JSON
             return userData.email === email;
         });
 
@@ -166,7 +177,63 @@ function logout(req, res) {
 
 }
 
-module.exports = { getUsers, registerUsers, loginUsers, logout }
+function delUser(req, res) {
+    const { email } = req.body; // O email do usuário a ser deletado
+
+    if (!email) {
+        return res.status(400).send('Email não fornecido');
+    }
+
+    // Verifica se o usuário está autenticado e se ele tem permissão para excluir usuários
+    const cookieJWT = req.cookies["session"];
+    if (!cookieJWT) {
+        return res.status(401).send('Não autorizado');
+    }
+
+    try {
+        const user = jwt.verify(cookieJWT, keySecrect); // Verifica o JWT
+        if (user.role !== 'admin') {
+            return res.status(403).send('Permissão negada');
+        }
+
+        // Se o usuário for admin, pode excluir outro usuário.
+        dbUsers.readAllData((err, data) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+            }
+
+            // Encontrar o usuário a ser deletado pelo email
+            const userIndex = data.findIndex(user => {
+                const userData = JSON.parse(user.value);
+                return userData.email === email; // Comparando pelo email
+            });
+
+            if (userIndex === -1) {
+                return res.status(404).send('Usuário não encontrado');
+            }
+
+            const userToDelete = data[userIndex];
+            const keyToDelete = userToDelete.key; // A chave do usuário a ser deletado
+
+            // Deletar o usuário pelo key
+            dbUsers.del(keyToDelete, (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'Erro ao deletar o usuário' });
+                }
+
+                return res.status(200).send('Usuário deletado com sucesso');
+            });
+        });
+    } catch (error) {
+        return res.status(401).send('Erro de autenticação');
+    }
+}
+
+
+
+module.exports = { getUser, getUsers, registerUsers, loginUsers, logout, delUser }
 
 
 

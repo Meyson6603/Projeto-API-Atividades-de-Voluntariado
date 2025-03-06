@@ -135,11 +135,11 @@ h2 {
     text-align: center;
 }
 
-#hidden {
+.hidden {
     display: none;
 }
 
-#show {
+.show {
     display: flex;
 }
 
@@ -150,7 +150,8 @@ h2 {
 #navbar {
     height: 100px;
     width: 100%;
-    background: linear-gradient(to bottom, #14B8A6, #e9e4f0);
+    /* background: linear-gradient(to bottom, #14B8A6, #e9e4f0); */
+    /* background: linear-gradient(#4bc9f7, #e9e4f0); */
     box-shadow: 0 0 5px black;
     position: fixed;
     top: 0px;
@@ -227,7 +228,7 @@ h2 {
 }
 
 #iconUser {
-    position: relative;
+    position: fixed;
     right: 50px;
     display: flex;
 }
@@ -257,4 +258,61 @@ h2 {
 #signUp {
     background: #14B8A6;
     cursor: pointer;
+}
+
+#box-activity {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+    height: 70%;
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 70vw;
+    border-radius: 20px;
+}
+
+#box-activity button {
+    height: fit-content;
+    background: none;
+    padding: 16px;
+    border: none;
+    background-color: #14B8A6;
+    border-radius: 10px;
+}
+
+#box-activity button:hover {
+    background-color: #0D9488;
+    transition: 500ms;
+    cursor: pointer;
+}
+
+#options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80%;
+    width: 60%;
+    flex-wrap: wrap;
+    /* background-color: green; */
+}
+
+#createActivityBox {
+    margin: auto;
+    justify-self: center;
+    align-self: center;
+    width: 60%;
+    height: 70%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+#createActivityBox input {
+    padding: 5px;
 }
