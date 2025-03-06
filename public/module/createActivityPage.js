@@ -1,7 +1,7 @@
 import pageADM from "./pageADM.js"
 
-export default function login(user) {
-    const body = window.document.body
+export default function createActivityPage(user) {
+    const body = document.body
 
     body.innerHTML = `<div id="navbar">
         <nav class="navbar">
@@ -35,19 +35,26 @@ export default function login(user) {
             </nav>
 
         </div>
+    </div>
+    <div id="box-activity">
+        <h1>Seja bem vindo ao sua pagina de Administração, Nome da pessoa</h1>
+        <div id="createActivityBox">
+            <label for="activityName">Nome da Atividade: <input type="text" placeholder="Nome da ativade"
+                    id="activityName"></label>
+            <label for="activityDate">Data: <input type="date" id="activityDate"></label>
+            <label for="activityVacancies">Numero de Vagas: <input type="number" placeholder="Numero de vagas"
+                    id="activityVacancies"></label>
+            <label for="activityLocation">Local da Atividade: <input type="text" placeholder="Local da ativade"
+                    id="activityLocation"></label>
+
+            <button>Criar Atividade</button>
+        </div>
+        <button id='back'>Voltar</button>
     </div>`
 
-    const logout = document.getElementById('logout')
-    logout.addEventListener('click', async () => {
-        const response = await fetch('/logout', {
-            method: 'POST'
-        })
-        if (response.ok) {
-            alert('Logout realizado com sucesso!')
-            window.location.href = '/'
-        } else {
-            alert('Erro ao fazer logout')
-        }
+    const backButton = document.getElementById('back')
+    backButton.addEventListener('click', () => {
+        pageADM(user)
     })
 
     const linkAdm = document.getElementById('adm')
@@ -61,4 +68,5 @@ export default function login(user) {
         pageADM(user)
         history.pushState({}, '', 'adm')
     })
+
 }

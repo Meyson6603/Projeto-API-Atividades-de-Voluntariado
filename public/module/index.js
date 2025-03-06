@@ -2,11 +2,17 @@ import userLogin from "./userLogin.js"
 import userRegister from "./userRegister.js"
 import landingPage from "./LandingPage.js"
 import login from "./login.js"
+import pageADM from "./pageADM.js"
 
-const button = document.getElementById('button')
-button.addEventListener('click', () => {
-    userLogin()
-    history.pushState({}, '', 'login')
+// const button = document.getElementById('button')
+// button.addEventListener('click', () => {
+//     userLogin()
+//     history.pushState({}, '', 'login')
+// })
+
+const backHome = document.getElementById('back')
+backHome.addEventListener('click', () => {
+    landingPage()
 })
 
 window.addEventListener('load', async () => {
@@ -27,9 +33,24 @@ window.addEventListener('load', async () => {
         userLogin()
     } else if (location.pathname == '/register') {
         userRegister()
-    } else if (location.pathname == '/') {
-    } else {
+    } else if (location.pathname == '/adm') {
+        try {
+            const response = await fetch('/me')
+            const data = await response.json()
+            if (data.role == 'admin') {
+                pageADM(data)
+            } else {
+                login(data)
+            }
+            // console.log(data)
 
+        } catch (error) {
+            // console.log('teste')
+            landingPage()
+        }
+
+    } else {
+        // userLogin()
     }
 
     window.addEventListener('popstate', async () => {
