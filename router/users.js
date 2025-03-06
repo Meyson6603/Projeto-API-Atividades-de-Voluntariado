@@ -23,6 +23,10 @@ router.post('/sla', registerUsers)
 
 router.post('/logout', logout)
 
+// router.get('/m', getAllUsers)
+
+
+
 
 // router.use((req, res) => {
 //     const filePath = path.join(__dirname, '..', 'public', 'index.html');
