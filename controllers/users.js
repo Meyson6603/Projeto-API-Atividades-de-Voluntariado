@@ -1,9 +1,11 @@
 // const { json } = require('express')
 const Database = require('../database/index')
 const dbUsers = new Database('users')
+// const dbActivities = new Database('activities')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
+// const { subscribe } = require('diagnostics_channel');
 require('dotenv').config({ path: './config/.env' })
 // const { use } = require('../router/users');
 
@@ -11,28 +13,41 @@ const keySecrect = process.env.KEYSECRET
 // const users = [{ id: 1, username: 'Meyson', email: 'meyson6603@gmail.com', password: '123456', role: 'admin' }, { id: 2, username: 'Vitor', email: 'vitor@gmail.com', password: '123456', role: 'admin' }]
 function getUsers(req, res) {
     // dbUsers.open()
-    dbUsers.readAllData((err, data) => {
-        if (err) {
-            console.log(err)
-            res.status(500).json({ error: 'Erro ao buscar usuários' });
-            return;
+
+    const cookieJWT = req.cookies["session"]
+    try {
+        const loginUser = jwt.verify(cookieJWT, keySecrect)
+        console.log(loginUser.username)
+
+        if (loginUser.role == 'admin') {
+            dbUsers.readAllData((err, data) => {
+                if (err) {
+                    console.log(err)
+                    res.status(500).json({ error: 'Erro ao buscar usuários' });
+                    return;
+                }
+                let dataUser = []
+                data.forEach(element => {
+                    dataUser.push(JSON.parse(element.value))
+                    // console.log(dataUser.username)
+                });
+                console.log(data)
+                console.log(dataUser)
+                res.json(dataUser);
+            });
         }
-        let dataUser = []
-        data.forEach(element => {
-            dataUser.push(JSON.parse(element.value))
-            // console.log(dataUser.username)
-        });
-        console.log(data)
-        console.log(dataUser)
-        res.json(dataUser);
-    });
+
+    } catch (error) {
+        return res.status(404).send('Permissão negada')
+    }
+
 }
 function getUser(req, res) {
     // res.json(null)
     // res.send(`<h1>Apenas um Teste</h1>`)
     // console.log('teste')
 
-    console.log()
+    // console.log()
 
     const cookieJWT = req.cookies["session"]
     try {
@@ -71,7 +86,7 @@ async function registerUsers(req, res) {
 
         // Se o email não existe, cria o novo usuário
         hashPassword(password).then((hashedPassword) => {
-            const newUser = { username, email, password: hashedPassword, role: 'user' };
+            const newUser = { username, email, password: hashedPassword, role: 'user', subscribeActivities: [] };
 
             dbUsers.put(crypto.randomUUID({ number: 1 }), JSON.stringify(newUser), (err) => {
                 if (err) {
@@ -81,7 +96,7 @@ async function registerUsers(req, res) {
 
                 // Criando o JWT para o novo usuário
                 const createJWT = jwt.sign(
-                    { username: newUser.username, email: newUser.email, role: newUser.role },
+                    { username: newUser.username, email: newUser.email, role: newUser.role, subscribeActivities: newUser.subscribeActivities },
                     keySecrect, // chave secreta para assinar o JWT
                     { expiresIn: '1h' } // Expiração do token (1 hora)
                 );
@@ -147,7 +162,7 @@ async function loginUsers(req, res) {
 
         // Criando o JWT para o usuário
         const createJWT = jwt.sign(
-            { username: userData.username, email: userData.email, role: userData.role },
+            { username: userData.username, email: userData.email, role: userData.role, subscribeActivities: userData.subscribeActivities },
             keySecrect, // chave secreta para assinar o JWT
             { expiresIn: '1h' } // Expiração do token (1 hora)
         );
@@ -231,9 +246,193 @@ function delUser(req, res) {
     }
 }
 
+function putUser(req, res) {
+    const email = req.body.email; // Email do usuário que será atualizado
+    const newNameUser = req.body.newNameUser; // Novo nome do usuário
+
+    // Verifica se o email e o novo nome foram fornecidos
+    if (!email || !newNameUser) {
+        return res.status(400).send('Email e novo nome do usuário são necessários');
+    }
+
+    // Verifica se o usuário está autenticado
+    const cookieJWT = req.cookies["session"];
+    if (!cookieJWT) {
+        return res.status(401).send('Não autorizado');
+    }
+
+    try {
+        const user = jwt.verify(cookieJWT, keySecrect); // Verifica o JWT do usuário
+        // Verifica se o usuário autenticado tem o papel de 'admin'
+        if (user.role !== 'admin') {
+            return res.status(403).send('Permissão negada');
+        }
+
+        // Acessa os dados do banco de dados
+        dbUsers.readAllData((err, data) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+            }
+
+            // Encontrar o usuário a ser atualizado pelo email
+            const userIndex = data.findIndex(user => {
+                const userData = JSON.parse(user.value);
+                return userData.email === email; // Comparando pelo email
+            });
+
+            if (userIndex === -1) {
+                return res.status(404).send('Usuário não encontrado');
+            }
+
+            const userToUpdate = data[userIndex];
+            const keyToUpdate = userToUpdate.key; // A chave do usuário a ser atualizado
+
+            // Recuperar os dados do usuário
+            const userData = JSON.parse(userToUpdate.value);
+
+            // Atualiza o nome do usuário
+            userData.username = newNameUser;
+
+            // Atualiza os dados no banco
+            dbUsers.put(keyToUpdate, JSON.stringify(userData), (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'Erro ao atualizar o nome do usuário' });
+                }
+
+                return res.status(200).send('Nome do usuário atualizado com sucesso');
+            });
+        });
+    } catch (error) {
+        return res.status(401).send('Erro de autenticação');
+    }
+}
 
 
-module.exports = { getUser, getUsers, registerUsers, loginUsers, logout, delUser }
+function putActivity(req, res) {
+    const key = req.body.key
+    const value = req.body.value
+    const email = req.body.email; // Email do usuário que será atualizado
+
+    // Verifica se o email e o novo nome foram fornecidos
+    if (!email) {
+        return res.status(400).send('Email do usuário é necessários');
+    }
+
+    // Verifica se o usuário está autenticado
+    const cookieJWT = req.cookies["session"];
+    if (!cookieJWT) {
+        return res.status(401).send('Não autorizado');
+    }
+
+    try {
+        // const user = jwt.verify(cookieJWT, keySecrect); // Verifica o JWT do usuário
+
+        // Acessa os dados do banco de dados
+        dbUsers.readAllData((err, data) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+            }
+
+            // Encontrar o usuário a ser atualizado pelo email
+            const userIndex = data.findIndex(user => {
+                const userData = JSON.parse(user.value);
+                return userData.email === email; // Comparando pelo email
+            });
+
+            if (userIndex === -1) {
+                return res.status(404).send('Usuário não encontrado');
+            }
+
+            const userToUpdate = data[userIndex];
+            const keyToUpdate = userToUpdate.key; // A chave do usuário a ser atualizado
+
+            // Recuperar os dados do usuário
+            const userData = JSON.parse(userToUpdate.value);
+
+            // Atualiza o nome do usuário
+            userData.subscribeActivities.push({ key: key, value: value });
+            console.log(userData)
+
+            // Atualiza os dados no banco
+            dbUsers.put(keyToUpdate, JSON.stringify(userData), (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'Erro ao atualizar o nome do usuário' });
+                }
+
+                return res.status(200).send('Nome do usuário atualizado com sucesso');
+            });
+        });
+    } catch (error) {
+        return res.status(401).send('Erro de autenticação');
+    }
+}
+function delActivity(req, res) {
+    const key = req.body.key
+    // const value = req.body.value
+    const email = req.body.email; // Email do usuário que será atualizado
+
+    // Verifica se o email e o novo nome foram fornecidos
+    if (!email) {
+        return res.status(400).send('Email do usuário é necessários');
+    }
+
+    // Verifica se o usuário está autenticado
+    const cookieJWT = req.cookies["session"];
+    if (!cookieJWT) {
+        return res.status(401).send('Não autorizado');
+    }
+
+    try {
+        // const user = jwt.verify(cookieJWT, keySecrect); // Verifica o JWT do usuário
+
+        // Acessa os dados do banco de dados
+        dbUsers.readAllData((err, data) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+            }
+
+            // Encontrar o usuário a ser atualizado pelo email
+            const userIndex = data.findIndex(user => {
+                const userData = JSON.parse(user.value);
+                return userData.email === email; // Comparando pelo email
+            });
+
+            if (userIndex === -1) {
+                return res.status(404).send('Usuário não encontrado');
+            }
+
+            const userToUpdate = data[userIndex];
+            const keyToUpdate = userToUpdate.key; // A chave do usuário a ser atualizado
+
+            // Recuperar os dados do usuário
+            const userData = JSON.parse(userToUpdate.value);
+
+            // Atualiza o nome do usuário
+            const userDataIndexActivity = userData.subscribeActivities.findIndex(user => user.key == key)
+
+            userData.subscribeActivities.splice(userDataIndexActivity, 1)
+
+            // Atualiza os dados no banco
+            dbUsers.put(keyToUpdate, JSON.stringify(userData), (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'Erro ao atualizar o nome do usuário' });
+                }
+
+                return res.status(200).json({ message: 'Nome do usuário atualizado com sucesso' });
+            });
+        });
+    } catch (error) {
+        return res.status(401).send('Erro de autenticação');
+    }
+}
+
+module.exports = { getUser, getUsers, registerUsers, loginUsers, logout, delUser, putUser, putActivity, delActivity }
 
 
 
