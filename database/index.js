@@ -45,6 +45,20 @@ class Database {
         };
         loop(); // Inicia o loop inicialmente 
     }
+    readData(key, callback) {
+        if (!this.db) {
+            return callback(new Error('O banco de dados não está aberto'));
+        }
+        this.db.get(key, (err, value) => {
+            if (err) {
+                return callback(err);
+            }
+            if (!value) {
+                return callback(null, null); // Nenhum valor encontrado para a chave fornecida
+            }
+            callback(null, { key, value: value.toString() }); // Retorna a chave e o valor como string
+        });
+    }
     put(key, value, callback) {
         if (!this.db) {
             return callback(new Error('O banco de dados não está aberto'));

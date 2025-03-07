@@ -1,6 +1,6 @@
 import userLogin from "./userLogin.js"
 import userRegister from "./userRegister.js"
-import landingPage from "./LandingPage.js"
+import landingPage from "./landingPage.js"
 import login from "./login.js"
 import pageADM from "./pageADM.js"
 

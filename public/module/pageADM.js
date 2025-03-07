@@ -1,4 +1,5 @@
 import createActivityPage from "./createActivityPage.js"
+import alActivities from "./allActivities.js"
 
 export default function pageADM(user) {
     const body = window.document.body
@@ -11,8 +12,8 @@ export default function pageADM(user) {
                     <a href="#">Atividades ↓</a>
                     <ul class="dropdown">
                         <li><a href="#">Atividades de Hoje</a></li>
-                        <li class='hidden' id='atv'><a href="#">Cadastrar Atividades</a></li>
-                        <li><a href="#">Todas as Atividades</a></li>
+                        <li class='hidden' id='atv'><a href="#" id='createActivityNav'>Cadastrar Atividades</a></li>
+                        <li><a href="#" id='allActivities'>Todas as Atividades</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a href="#">Sobre</a></li>
@@ -102,6 +103,10 @@ export default function pageADM(user) {
                 delUser.innerHTML = '❌'
                 delUser.style.cursor = 'pointer'
                 boxManipulation.appendChild(delUser)
+                const editUser = document.createElement('p')
+                editUser.innerHTML = '✏️'
+                editUser.style.cursor = 'pointer'
+                boxManipulation.appendChild(editUser)
 
                 // const seeUser = document.getElementById('seeUser')
                 seeUser.addEventListener('click', () => {
@@ -126,7 +131,22 @@ export default function pageADM(user) {
                     }
 
                 })
+                editUser.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch('/putUser', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: element.email, newNameUser: 'Jorge' })
+                        })
+
+                        const data = await response.json()
+                        console.log(data)
+                    } catch (error) {
+                        console.log(error)
+                    }
+                })
             });
+
 
             back.innerHTML = 'Voltar'
             boxActivity.appendChild(back)
@@ -139,8 +159,21 @@ export default function pageADM(user) {
     }
 
     const createActivity = document.getElementById('createActivity')
+    const createActivityNav = document.getElementById('createActivityNav')
     createActivity.addEventListener('click', () => {
         createActivityPage(user)
+    })
+    createActivityNav.addEventListener('click', () => {
+        createActivityPage(user)
+    })
+
+    const allActivities = document.getElementById('allActivities')
+    allActivities.addEventListener('click', async () => {
+        // const response = await fetch('/getAllActivities')
+        // const data = await response.json()
+
+        // console.log(data)
+        alActivities(user)
     })
     // const createActivity = document.getElementById('createActivity')
 }

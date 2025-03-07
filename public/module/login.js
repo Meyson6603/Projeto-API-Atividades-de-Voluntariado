@@ -1,4 +1,6 @@
 import pageADM from "./pageADM.js"
+import alActivities from "./allActivities.js"
+
 
 export default function login(user) {
     const body = window.document.body
@@ -12,7 +14,7 @@ export default function login(user) {
                     <ul class="dropdown">
                         <li><a href="#">Atividades de Hoje</a></li>
                         <li class='hidden' id='atv'><a href="#">Cadastrar Atividades</a></li>
-                        <li><a href="#">Todas as Atividades</a></li>
+                        <li><a href="#" id='allActivities'>Todas as Atividades</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a href="#">Sobre</a></li>
@@ -60,5 +62,14 @@ export default function login(user) {
     linkAdm.addEventListener('click', () => {
         pageADM(user)
         history.pushState({}, '', 'adm')
+    })
+    const allActivities = document.getElementById('allActivities')
+    allActivities.addEventListener('click', (e) => {
+        // const response = await fetch('/getAllActivities')
+        // const data = await response.json()
+
+        console.log(user)
+        e.preventDefault()
+        alActivities(user)
     })
 }

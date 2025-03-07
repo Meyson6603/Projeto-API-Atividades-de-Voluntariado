@@ -47,7 +47,7 @@ export default function createActivityPage(user) {
             <label for="activityLocation">Local da Atividade: <input type="text" placeholder="Local da ativade"
                     id="activityLocation"></label>
 
-            <button>Criar Atividade</button>
+            <button id='createActivity'>Criar Atividade</button>
         </div>
         <button id='back'>Voltar</button>
     </div>`
@@ -69,4 +69,20 @@ export default function createActivityPage(user) {
         history.pushState({}, '', 'adm')
     })
 
+    const createButton = document.getElementById('createActivity')
+    createButton.addEventListener('click', async () => {
+        const activityName = document.getElementById('activityName')
+        const activityDate = document.getElementById('activityDate')
+        const activityVacancies = document.getElementById('activityVacancies')
+        const activityLocation = document.getElementById('activityLocation')
+        // console.log(activityDate.value)
+
+        const response = await fetch('/createActivity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ activityName: activityName.value, activityDate: activityDate.value, activityVacancies: parseInt(activityVacancies.value), activityLocation: activityLocation.value, vacanciesFilled: [] })
+        })
+        const data = await response.json()
+        console.log(data)
+    })
 }

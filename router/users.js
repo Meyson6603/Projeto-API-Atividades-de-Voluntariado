@@ -1,6 +1,6 @@
 const express = require('express')
 const path = require('path');
-const { getUser, getUsers, registerUsers, loginUsers, logout, delUser } = require('../controllers/users')
+const { getUser, getUsers, registerUsers, loginUsers, logout, delUser, putUser, putActivity, delActivity } = require('../controllers/users')
 const router = express.Router()
 // const { userLogin } = require('../public/module/userLogin')
 // import userLogin from '../public/module/userLogin.js';
@@ -29,11 +29,14 @@ router.post('/sla', registerUsers)
 router.post('/logout', logout)
 
 router.get('/getUsers', getUsers)
-
+router.put('/putUser', putUser)
+router.put('/putActivityUser', putActivity)
+router.put('/delActivityUser', delActivity)
+// router.put('/putActivity', subscribeToActivity)
 router.delete('/delUser', delUser)
 
 // router.get('*', (req, res) => {
-//     const filePath = path.join(__dirname, '..', 'public', 'module', 'index.js')
+//     const filePath = path.join(__dirname, '..', 'public', 'index.html')
 //     res.sendFile(filePath)
 // })
 module.exports = router

@@ -316,3 +316,18 @@ h2 {
 #createActivityBox input {
     padding: 5px;
 }
+
+#allActivityBox {
+    margin: auto;
+    justify-self: center;
+    align-self: center;
+    width: 60%;
+    height: 70%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+}
