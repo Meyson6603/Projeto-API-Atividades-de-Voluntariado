@@ -1,10 +1,10 @@
 const express = require('express')
 const path = require('path');
-const { getUsers, registerUsers, loginUsers, logout } = require('../controllers/users')
+const { getUser, getUsers, registerUsers, loginUsers, logout, delUser, putUser, putActivity, delActivity } = require('../controllers/users')
 const router = express.Router()
 // const { userLogin } = require('../public/module/userLogin')
 // import userLogin from '../public/module/userLogin.js';
-router.get('/me', getUsers)
+router.get('/me', getUser)
 // router.post('/', (req, res) => {
 //     // const us
 // })
@@ -17,20 +17,26 @@ router.get('/register', (req, res) => {
     const filePath = path.join(__dirname, '..', 'public', 'index.html');
     res.sendFile(filePath);
 })
+
+router.get('/adm', (req, res) => {
+    const filePath = path.join(__dirname, '..', 'public', 'index.html')
+    res.sendFile(filePath)
+})
 router.post('/', loginUsers)
 
 router.post('/sla', registerUsers)
 
 router.post('/logout', logout)
 
-// router.get('/m', getAllUsers)
+router.get('/getUsers', getUsers)
+router.put('/putUser', putUser)
+router.put('/putActivityUser', putActivity)
+router.put('/delActivityUser', delActivity)
+// router.put('/putActivity', subscribeToActivity)
+router.delete('/delUser', delUser)
 
-
-
-
-// router.use((req, res) => {
-//     const filePath = path.join(__dirname, '..', 'public', 'index.html');
-//     res.status(404).sendFile(filePath)
-// });
-
+// router.get('*', (req, res) => {
+//     const filePath = path.join(__dirname, '..', 'public', 'index.html')
+//     res.sendFile(filePath)
+// })
 module.exports = router
